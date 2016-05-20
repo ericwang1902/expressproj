@@ -1,4 +1,5 @@
 var sysuserModel = require('../models/sysuserModel.js');
+var bcrypt = require('bcryptjs');
 
 /**
  * sysuserController.js
@@ -6,51 +7,35 @@ var sysuserModel = require('../models/sysuserModel.js');
  * @description :: Server-side logic for managing sysusers.
  */
 module.exports = {
-
-    //系统管理员初始化
-    initSysUser:function(userinfo){
-        
-        var sysuser = new sysuserModel({
-			mobile : userinfo.mobile,
-			psd : userinfo.psd,
-			usertype : userinfo.usertype,
-			openid : userinfo.openid,
-			count : userinfo.count,
-			type : userinfo.type,
-			account : userinfo.account,
-			accountpsd : userinfo.accountpsd,
-			orgid : userinfo.orgid,
-			groupid : userinfo.groupid,
-			status : userinfo.status,
-			isbroadcast : userinfo.isbroadcast
-        });
-        
-       sysuserModel.findOne({mobile:"admin888"},function(err,result){
-           
-                if(err){
-                    console.log(err);
-                }
-                
-                 
-               
-                if(!result){
-                    sysuser.save(function (err,result) {
-                        if(err){
-                            console.log(err);
-                        }
-                        console.log("sys initSysUser created");
-                    })    
-                }
-               
-                if (result) {
-                   console.log(result); 
-                }
-
-            } 
-        )
-
-         
+    //查找用户
+    findUserByName:function(username,callback){
+        sysuserModel.findOne({mobile:username},callback)
     },
+    
+    //创建用户，密码加密创建
+    createUser:function(userinfo,callback){
+        bcrypt.genSalt(10,function(err,salt){
+           bcrypt.hash(userinfo.psd,salt,function(err,hash){
+               userinfo.psd=hash;
+               userinfo.save(callback);
+           })      
+        });
+    },
+    
+    /**
+     * 这里是学习callback的好例子，函数本身定义一个callback用来返回值
+     * 内部bcrypt比对结果isMatch是最终返回值，所以只能在bcryptcompare的回调函数中
+     * 此奥用callback来返回最终的isMatch
+     * 
+     * 
+     *  */
+    comparePsd:function(formpsd,hashpsd,callback){
+        bcrypt.compare(formpsd,hashpsd,function(err,isMatch){
+            if(err) throw err;
+            callback(null,isMatch)
+        })
+    },
+
     /**
      * sysuserController.list()
      */

@@ -1,6 +1,7 @@
 var Sysuser = require('./controllers/sysuserController.js')
+var SysuserModel = require('./models/sysuserModel.js')
 
-var userinfo = 
+var userinfo = new SysuserModel(
     {
         mobile:"admin888",
         psd:"admin888",
@@ -15,9 +16,25 @@ var userinfo =
 		status : "",
 		isbroadcast : ""
     }
-
-
+)
 
 module.exports.init= function() {
-	Sysuser.initSysUser(userinfo);
+	   SysuserModel.findOne({mobile:"admin888"},function(err,result){         
+                if(err){
+                    console.log(err);
+                }    
+                if(!result){
+                    Sysuser.createUser(userinfo,function(err,user){
+                        if(err) throw err;
+                        console.log(user);
+              
+                    })
+                }
+               
+                if (result) {
+                   console.log(result); 
+                }
+
+            } 
+        )
 } 
