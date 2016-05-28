@@ -52,6 +52,7 @@ passport.deserializeUser(function(id, done) {
     done(err, user);
   });
 });
+
 //编写策略
 passport.use(new LocalStrategy(
     function(username,password,done){
@@ -60,8 +61,7 @@ passport.use(new LocalStrategy(
             console.log('username:'+username)
             console.log('password:'+password)
             if(err) throw err;
-            if(!user){
-                
+            if(!user){ 
                 return done(null,false,{message:'username is wrong'})
             }
             sysuserController.comparePsd(password,user.psd,function(err,isMatch){
@@ -91,9 +91,6 @@ app.use(passport.session());
 app.use(flash());
 //以上均是passport部分，详见http://idlelife.org/archives/808
 
-
-
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -106,9 +103,6 @@ app.all('*',function(req,res,next){
     res.header("Content-Type", "application/json;charset=utf-8");
     next();
 });
-
-
-
 
 app.use('/', routes);
 app.use('/users', users);

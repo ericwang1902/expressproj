@@ -26,14 +26,12 @@ router.post('/auth', passport.authenticate('local'),function (req,res) {
   iss: req.body.username,
   exp: expires
 }, app.get('jwtTokenSecret'));
-
   res.json({
     token : token,
     expires: expires,
     user: req.body
   });
-
-  //res.send(JSON.stringify(req.body));
+  
 });
 
 
